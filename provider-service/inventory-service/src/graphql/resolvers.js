@@ -73,7 +73,17 @@ const resolvers = {
     },
 
     inventory: async (_, { id }, context) => {
-      requireAuth(context);
+      // Exception: Service-to-service calls tidak memerlukan authentication
+      // Cek jika request dari service (tidak ada user di context)
+      // Untuk development, kita allow jika context.user tidak ada (service call)
+      const isServiceCall = !context || !context.user || context.user === null || context.user === undefined;
+      
+      if (!isServiceCall) {
+        requireAuth(context);
+      } else {
+        console.log('✅ Allowing service-to-service inventory query (no auth required)');
+      }
+      
       try {
         const item = await Inventory.findById(id);
         

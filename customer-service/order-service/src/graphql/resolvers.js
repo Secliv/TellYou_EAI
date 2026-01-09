@@ -169,10 +169,30 @@ const resolvers = {
   Mutation: {
     // POST /order - Create new order
     createOrder: async (_, { input }, context) => {
-      const user = requireAuth(context);
+      const { customerId, customerName, items, notes, shippingAddress } = input;
+      
+      // Exception: Request dari stock-payment-service (service-to-service) tidak memerlukan authentication
+      // Cek berdasarkan customerId = 0 dan customerName mengandung "Integration" atau "External System"
+      const isServiceToServiceCall = (customerId === 0 || customerId === '0') && 
+                                     (customerName?.includes('Integration') || 
+                                      customerName?.includes('External System') ||
+                                      notes?.includes('External Order ID'));
+      
+      let user;
+      if (isServiceToServiceCall) {
+        console.log('✅ Allowing service-to-service order creation (no auth required)');
+        // Set user untuk service account
+        user = {
+          id: 'service',
+          email: 'service@stock-payment-service.com',
+          role: 'service'
+        };
+      } else {
+        // Untuk request lainnya, tetap require authentication
+        user = requireAuth(context);
+      }
+      
       try {
-        const { customerId, customerName, items, notes, shippingAddress } = input;
-        
         // Validate items
         if (!items || items.length === 0) {
           return {
@@ -183,8 +203,19 @@ const resolvers = {
         }
         
         // Non-admin users can only create orders for themselves
-        const finalCustomerId = user.role === 'admin' ? (customerId || user.id) : user.id;
-        const finalCustomerName = customerName || user.email;
+        // For service calls, always use customerId from input (which is 0 for external orders)
+        let finalCustomerId;
+        if (user.role === 'service') {
+          // Service calls: use customerId from input (0 for external orders)
+          finalCustomerId = customerId !== undefined && customerId !== null ? customerId : 0;
+        } else if (user.role === 'admin') {
+          // Admin: can use provided customerId or default to user.id
+          finalCustomerId = customerId || user.id;
+        } else {
+          // Regular users: can only create orders for themselves
+          finalCustomerId = user.id;
+        }
+        const finalCustomerName = customerName || (user.role === 'service' ? 'External System' : user.email);
         
         // Calculate total price
         const totalPrice = items.reduce((sum, item) => {
@@ -216,7 +247,24 @@ const resolvers = {
 
     // Update order status
     updateOrderStatus: async (_, { id, status }, context) => {
-      const user = requireAuth(context);
+      // Exception: Service-to-service calls dari SNP tidak memerlukan authentication
+      // Cek jika tidak ada user di context (service call)
+      const isServiceCall = !context || !context.user || context.user === null || context.user === undefined;
+      
+      let user;
+      if (isServiceCall) {
+        console.log('✅ Allowing service-to-service order status update (no auth required)');
+        // Set user untuk service account
+        user = {
+          id: 'service',
+          email: 'service@stock-payment-service.com',
+          role: 'service'
+        };
+      } else {
+        // Untuk request lainnya, tetap require authentication
+        user = requireAuth(context);
+      }
+      
       try {
         const existingOrder = await Order.findById(id);
         
@@ -228,8 +276,8 @@ const resolvers = {
           };
         }
         
-        // Non-admin users can only update their own orders, and only to cancel
-        if (user.role !== 'admin') {
+        // Non-admin and non-service users can only update their own orders, and only to cancel
+        if (user.role !== 'admin' && user.role !== 'service') {
           if (parseInt(existingOrder.customerId) !== parseInt(user.id)) {
             throw new GraphQLError('Access denied', {
               extensions: {

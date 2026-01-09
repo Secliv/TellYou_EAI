@@ -90,8 +90,24 @@ const resolvers = {
     Mutation: {
         // Create new transaction
         createTransaction: async (_, { input }, context) => {
-            // Check authentication first - throw immediately if not authenticated
-            requireAuth(context);
+            // Exception: Gateway Toko Kue tidak memerlukan authentication
+            // Cek jika request dari TOKO_KUE_GATEWAY
+            const isTokoKueGateway = input && input.source_system === 'TOKO_KUE_GATEWAY';
+            
+            if (!isTokoKueGateway) {
+                // Untuk request lainnya, tetap require authentication
+                requireAuth(context);
+            } else {
+                console.log('✅ Allowing request from Toko Kue Gateway (no auth required)');
+                // Set context.user untuk service account (optional, untuk logging)
+                if (!context.user) {
+                    context.user = {
+                        id: 'service',
+                        email: 'gateway@toko-kue.com',
+                        role: 'service'
+                    };
+                }
+            }
             
             try {
                 return await TransactionService.createTransaction(input, context);

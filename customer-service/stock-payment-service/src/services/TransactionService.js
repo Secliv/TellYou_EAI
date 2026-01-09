@@ -374,6 +374,8 @@ class TransactionService {
     static async callOrderService(orderData) {
         try {
         console.log('📞 Calling Order Service via GraphQL...');
+        console.log('📞 Order Service URL:', `${process.env.ORDER_SERVICE_URL}/graphql`);
+        console.log('📞 Order Data:', JSON.stringify(orderData, null, 2));
         
         // 1. Get product names from inventory service
         const orderItems = await Promise.all(
@@ -474,8 +476,11 @@ class TransactionService {
             }
         );
 
+        console.log('📞 Order Service Response:', JSON.stringify(response.data, null, 2));
+        
         if (response.data.errors) {
             const error = response.data.errors[0];
+            console.error('❌ Order Service GraphQL Error:', error);
             // Check if it's an authentication error
             if (error.extensions && (error.extensions.code === 'UNAUTHENTICATED' || error.extensions.code === 'FORBIDDEN')) {
                 throw new Error(`Order service authentication error: ${error.message}`);
@@ -483,9 +488,19 @@ class TransactionService {
             throw new Error(error.message || 'GraphQL error');
         }
 
-        const orderResponse = response.data.data.createOrder;
+        const orderResponse = response.data.data?.createOrder;
+        
+        if (!orderResponse) {
+            console.error('❌ Order Service Response: No createOrder in response.data.data');
+            console.error('❌ Full Response:', JSON.stringify(response.data, null, 2));
+            throw new Error('Invalid response from order service: createOrder not found');
+        }
+
+        console.log('✅ Order Service Response Success:', orderResponse.success);
+        console.log('✅ Order Service Response Order:', orderResponse.order);
 
         if (!orderResponse.success || !orderResponse.order) {
+            console.error('❌ Order Service Response Error:', orderResponse.message);
             throw new Error(orderResponse.message || 'Failed to create order');
         }
 
