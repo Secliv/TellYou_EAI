@@ -138,11 +138,24 @@ tellyou_eai/
 
 ## Port Mapping
 
-- **User Service**: `3000:3000`
-- **Inventory Service**: `3001:3000`
-- **Payment Service**: `3002:3000`
-- **Order Service**: `3003:3000`
-- **Stock-Payment Service**: `3004:3000`
+| Service | Port (Host) | Port (Container) | GraphQL Endpoint | REST Base URL |
+|---------|-------------|------------------|------------------|---------------|
+| User Service | 3000 | 3000 | http://localhost:3000/graphql | http://localhost:3000 |
+| Inventory Service | 3001 | 3000 | http://localhost:3001/graphql | http://localhost:3001 |
+| Payment Service | 3002 | 3000 | http://localhost:3002/graphql | http://localhost:3002 |
+| Order Service | 3003 | 3000 | http://localhost:3003/graphql | http://localhost:3003 |
+| Stock-Payment Service | 3004 | 3000 | http://localhost:3004/graphql | http://localhost:3004/api |
+| Frontend | 5174 | 5173 | - | http://localhost:5174 |
+
+## Database Ports
+
+| Database | Port (Host) | Port (Container) |
+|----------|-------------|------------------|
+| user-db | 5438 | 5432 |
+| inventory-db | 5434 | 5432 |
+| payment-db | 5436 | 5432 |
+| order-db | 5435 | 5432 |
+| stock-payment-db | 5437 | 5432 |
 
 ## Network Architecture
 
@@ -150,10 +163,25 @@ tellyou_eai/
 - **customer-network**: Jaringan untuk microservices di Customer-Service
 - **shared-network**: Jaringan bersama untuk komunikasi antar container
 
+## Authentication & Authorization
+
+Semua services menggunakan **JWT (JSON Web Token)** untuk authentication:
+
+- **JWT Secret**: Dikonfigurasi via environment variable `JWT_SECRET` (harus sama di semua services)
+- **Token Expiry**: Default 24 jam (dapat dikonfigurasi via `JWT_EXPIRES_IN`)
+- **Public Endpoints**: Hanya `register` dan `login` di user-service
+- **Protected Endpoints**: Semua GraphQL query dan mutation memerlukan valid JWT token
+- **Role-Based Access**: 
+  - `user` role: Dapat mengakses data mereka sendiri
+  - `admin` role: Dapat mengakses semua data dan operasi
+
 ## Prinsip Desain
 
 1. **1 Layanan 1 Database**: Setiap microservice memiliki database terpisah
 2. **Isolasi Data**: Data antar layanan terisolasi untuk mengurangi ketergantungan
 3. **Container Besar**: Provider-Service dan Customer-Service sebagai container logis
 4. **Microservices**: Setiap layanan dapat di-deploy dan di-scale secara independen
+5. **GraphQL First**: Semua services memiliki GraphQL API sebagai primary interface
+6. **REST Compatibility**: REST endpoints tetap tersedia untuk backward compatibility
+7. **Security First**: Semua endpoints memerlukan authentication kecuali public endpoints
 

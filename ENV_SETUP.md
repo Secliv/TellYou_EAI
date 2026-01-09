@@ -62,7 +62,10 @@ DB_PORT=5432
 DB_NAME=inventory_db
 DB_USER=postgres
 DB_PASSWORD=postgres
+JWT_SECRET=your-secret-key-here-change-in-production
 ```
+
+**Catatan**: `JWT_SECRET` harus sama dengan semua services lainnya untuk verifikasi token.
 
 ### Payment Service
 
@@ -74,7 +77,10 @@ DB_PORT=5432
 DB_NAME=payment_db
 DB_USER=postgres
 DB_PASSWORD=postgres
+JWT_SECRET=your-secret-key-here-change-in-production
 ```
+
+**Catatan**: `JWT_SECRET` harus sama dengan semua services lainnya untuk verifikasi token.
 
 ### Order Service
 
@@ -86,7 +92,13 @@ DB_PORT=5432
 DB_NAME=order_db
 DB_USER=postgres
 DB_PASSWORD=postgres
+JWT_SECRET=your-secret-key-here-change-in-production
+INVENTORY_SERVICE_URL=http://localhost:3001
 ```
+
+**Catatan**: 
+- `JWT_SECRET` harus sama dengan semua services lainnya untuk verifikasi token.
+- `INVENTORY_SERVICE_URL` digunakan untuk integrasi dengan inventory service.
 
 ### Stock-Payment Service
 
@@ -98,7 +110,15 @@ DB_PORT=5432
 DB_NAME=stock_payment_db
 DB_USER=postgres
 DB_PASSWORD=postgres
+JWT_SECRET=your-secret-key-here-change-in-production
+ORDER_SERVICE_URL=http://localhost:3003
+PAYMENT_SERVICE_URL=http://localhost:3002
+INVENTORY_SERVICE_URL=http://localhost:3001
 ```
+
+**Catatan**: 
+- `JWT_SECRET` harus sama dengan semua services lainnya untuk verifikasi token.
+- Service URLs digunakan untuk integrasi antar services.
 
 ## Database Host Configuration
 
@@ -119,9 +139,12 @@ Untuk production, pastikan:
 
 1. **Ganti semua password default** dengan password yang kuat
 2. **Ganti JWT_SECRET** dengan secret key yang aman (minimal 32 karakter random)
+   - **PENTING**: `JWT_SECRET` harus **SAMA** di semua services untuk verifikasi token
+   - Generate sekali dan gunakan di semua services
 3. **Set NODE_ENV=production**
 4. **Gunakan environment variables dari hosting platform** (bukan hardcode di file)
 5. **Jangan commit file .env** ke repository (sudah di-ignore di .gitignore)
+6. **Update service URLs** untuk production (jika menggunakan internal service discovery)
 
 ## Generate Secure JWT Secret
 

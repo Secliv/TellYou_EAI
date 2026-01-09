@@ -2,6 +2,9 @@
 
 Sistem manajemen bahan kue dengan arsitektur microservices yang terdiri dari 2 container besar: Provider-Service dan Customer-Service.
 
+> **🚀 Quick Start**: Lihat [`QUICK_START.md`](./QUICK_START.md) untuk panduan cepat memulai project.  
+> **🔐 Authentication**: Semua GraphQL endpoints memerlukan JWT token. Lihat [`GRAPHQL_AUTH_GUIDE.md`](./GRAPHQL_AUTH_GUIDE.md) untuk panduan lengkap.
+
 ## Arsitektur Sistem
 
 ### Provider-Service (Container Besar)
@@ -36,6 +39,16 @@ Setiap microservice memiliki database terpisah (1 layanan 1 database) untuk isol
 
 - Docker Desktop (atau Docker Engine + Docker Compose)
 - Node.js 18+ (untuk development lokal)
+- PostgreSQL (untuk development lokal, atau gunakan Docker)
+
+## Features
+
+- ✅ **JWT Authentication** - Semua GraphQL endpoints memerlukan authentication
+- ✅ **Role-Based Access Control** - Admin dan User roles dengan permission berbeda
+- ✅ **GraphQL API** - Semua services memiliki GraphQL endpoint
+- ✅ **REST API** - Backward compatibility dengan REST endpoints
+- ✅ **Microservices Architecture** - Setiap service dapat di-deploy secara independen
+- ✅ **Database Isolation** - Setiap service memiliki database terpisah
 
 ## Frontend
 
@@ -138,11 +151,22 @@ docker compose restart user-service
 - ✅ Tidak perlu install dependencies lokal
 
 **Akses services:**
-- User Service: http://localhost:3000
-- Inventory Service: http://localhost:3001
-- Payment Service: http://localhost:3002
-- Order Service: http://localhost:3003
-- Stock-Payment Service: http://localhost:3004
+- **User Service**: 
+  - REST API: http://localhost:3000
+  - GraphQL: http://localhost:3000/graphql
+- **Inventory Service**: 
+  - REST API: http://localhost:3001
+  - GraphQL: http://localhost:3001/graphql
+- **Payment Service**: 
+  - REST API: http://localhost:3002
+  - GraphQL: http://localhost:3002/graphql
+- **Order Service**: 
+  - REST API: http://localhost:3003
+  - GraphQL: http://localhost:3003/graphql
+- **Stock-Payment Service**: 
+  - REST API: http://localhost:3004/api
+  - GraphQL: http://localhost:3004/graphql
+- **Frontend**: http://localhost:5174 (Docker) atau http://localhost:5173 (local)
 
 ### Mode 2: Local Development (Tanpa Docker)
 
@@ -227,31 +251,110 @@ docker compose restart
 
 ## Endpoints
 
-### User Service
-- GET /users - Mendapatkan daftar pengguna
-- GET /users/{id} - Mendapatkan detail pengguna
-- POST /users - Membuat pengguna baru
-- PUT /users/{id} - Memperbarui data pengguna
-- DELETE /users/{id} - Menghapus pengguna
-- POST /auth/login - Login pengguna
-- POST /auth/register - Registrasi pengguna baru
+### ⚠️ PENTING: Authentication Required
 
-### Inventory Management Service
-- GET /inventories - Mendapatkan daftar bahan kue
-- POST /order - Membuat pesanan bahan kue
-- POST /update-stock - Memperbarui stok bahan kue
+**Semua GraphQL endpoints memerlukan JWT token** (kecuali `register` dan `login` di user-service).
 
-### Payment Processing Service
-- POST /payment - Mengonfirmasi pembayaran
-- GET /payment-status - Memeriksa status pembayaran
+Lihat `GRAPHQL_AUTH_GUIDE.md` dan `AUTHENTICATION_SUMMARY.md` untuk panduan lengkap.
 
-### Order Management Service
-- POST /order - Membuat pesanan bahan kue dari provider
-- GET /order/{id} - Menampilkan status pesanan
+### User Service (Port 3000)
+**REST API:**
+- GET /users - Mendapatkan daftar pengguna (requires auth)
+- GET /users/{id} - Mendapatkan detail pengguna (requires auth)
+- POST /users - Membuat pengguna baru (requires admin)
+- PUT /users/{id} - Memperbarui data pengguna (requires auth)
+- DELETE /users/{id} - Menghapus pengguna (requires admin)
+- POST /auth/login - Login pengguna (public)
+- POST /auth/register - Registrasi pengguna baru (public)
 
-### Stock and Payment Update Service
-- POST /update-stock - Mengupdate stok bahan kue
-- POST /payment - Memproses pembayaran
+**GraphQL:** `http://localhost:3000/graphql`
+- Query: `me`, `users` (admin), `user`, `userProfile`
+- Mutation: `register` (public), `login` (public), `createUser` (admin), `updateUser`, `deleteUser` (admin), `updateUserProfile`
+
+### Inventory Management Service (Port 3001)
+**REST API:**
+- GET /inventories - Mendapatkan daftar bahan kue (requires auth)
+- POST /update-stock - Memperbarui stok bahan kue (requires auth)
+
+**GraphQL:** `http://localhost:3001/graphql`
+- Query: `inventories`, `inventory`, `inventoryStats`, `lowStockItems` (all require auth)
+- Mutation: `createInventory` (admin), `updateInventory` (admin), `updateStock` (auth), `deleteInventory` (admin)
+
+### Payment Processing Service (Port 3002)
+**REST API:**
+- POST /payment - Membuat pembayaran (requires auth)
+- GET /payment-status - Memeriksa status pembayaran (requires auth)
+
+**GraphQL:** `http://localhost:3002/graphql`
+- Query: `payments`, `payment`, `paymentByOrder`, `paymentStats` (admin)
+- Mutation: `createPayment` (auth), `confirmPayment` (admin), `updatePaymentStatus` (admin)
+
+### Order Management Service (Port 3003)
+**REST API:**
+- POST /order - Membuat pesanan (requires auth)
+- GET /order/{id} - Menampilkan status pesanan (requires auth)
+- GET /orders - Mendapatkan daftar pesanan (requires auth)
+- PUT /order/{id}/status - Update status pesanan (requires auth/admin)
+
+**GraphQL:** `http://localhost:3003/graphql`
+- Query: `order`, `orders`, `orderStatus` (all require auth)
+- Mutation: `createOrder` (auth), `updateOrderStatus` (auth/admin), `updateOrder` (auth), `cancelOrder` (auth), `deleteOrder` (admin)
+
+### Stock and Payment Update Service (Port 3004)
+**REST API:**
+- POST /api/transactions - Membuat transaksi (requires auth)
+- GET /api/transactions - Mendapatkan daftar transaksi (requires auth)
+
+**GraphQL:** `http://localhost:3004/graphql`
+- Query: `transactions`, `transaction`, `statistics` (admin)
+- Mutation: `createTransaction` (auth), `confirmPayment` (admin)
+
+## Authentication & Authorization
+
+**Semua GraphQL endpoints memerlukan JWT token** untuk autentikasi. Hanya `register` dan `login` di user-service yang public.
+
+### Quick Start dengan Authentication
+
+1. **Login/Register untuk mendapatkan token:**
+   ```bash
+   # Via GraphQL (Recommended)
+   # Buka http://localhost:3000/graphql dan jalankan:
+   ```
+   ```graphql
+   mutation {
+     login(input: {
+       email: "admin@example.com"
+       password: "password123"
+     }) {
+       success
+       token
+       user {
+         id
+         email
+         role
+       }
+     }
+   }
+   ```
+
+2. **Gunakan token di GraphQL Playground:**
+   - Buka GraphQL Playground di service yang ingin diakses
+   - Di tab "HTTP HEADERS", tambahkan:
+   ```json
+   {
+     "Authorization": "Bearer YOUR_JWT_TOKEN_HERE"
+   }
+   ```
+
+3. **Atau via REST API:**
+   ```bash
+   curl -X GET http://localhost:3000/users \
+     -H "Authorization: Bearer YOUR_TOKEN_HERE"
+   ```
+
+**Lihat dokumentasi lengkap:**
+- `GRAPHQL_AUTH_GUIDE.md` - Panduan lengkap GraphQL authentication
+- `AUTHENTICATION_SUMMARY.md` - Summary authentication untuk semua services
 
 ## Testing Services
 
@@ -262,7 +365,7 @@ Lihat dokumentasi lengkap di `provider-service/user-service/TESTING.md`
 **Quick Test dengan curl:**
 
 ```bash
-# 1. Register user baru
+# 1. Register user baru (REST API)
 curl -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
   -d '{
@@ -272,7 +375,7 @@ curl -X POST http://localhost:3000/auth/register \
     "role": "user"
   }'
 
-# 2. Login
+# 2. Login (REST API)
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
   -d '{
@@ -289,7 +392,52 @@ curl -X GET http://localhost:3000/users \
 ```bash
 curl http://localhost:3000/health  # User Service
 curl http://localhost:3001/health  # Inventory Service
-curl http://localhost:3002/health   # Payment Service
+curl http://localhost:3002/health  # Payment Service
 curl http://localhost:3003/health  # Order Service
 curl http://localhost:3004/health  # Stock-Payment Service
 ```
+
+### Test GraphQL dengan Authentication
+
+Buka GraphQL Playground di browser:
+- User Service: http://localhost:3000/graphql
+- Inventory Service: http://localhost:3001/graphql
+- Payment Service: http://localhost:3002/graphql
+- Order Service: http://localhost:3003/graphql
+- Stock-Payment Service: http://localhost:3004/graphql
+
+**Pastikan untuk menambahkan Authorization header dengan token JWT!**
+
+## Dokumentasi Lengkap
+
+- **QUICK_START.md** - Panduan cepat memulai project
+- **GRAPHQL_AUTH_GUIDE.md** - Panduan lengkap GraphQL authentication
+- **AUTHENTICATION_SUMMARY.md** - Summary authentication untuk semua services
+- **STRUCTURE.md** - Struktur dan arsitektur project
+- **SETUP.md** - Panduan setup Docker dan environment
+- **ENV_SETUP.md** - Panduan setup environment variables
+- **docs/TESTING.md** - Panduan testing services
+
+## Port Summary
+
+| Service | Port | GraphQL | REST API | Database Port |
+|---------|------|---------|----------|--------------|
+| User Service | 3000 | ✅ | ✅ | 5438 |
+| Inventory Service | 3001 | ✅ | ✅ | 5434 |
+| Payment Service | 3002 | ✅ | ✅ | 5436 |
+| Order Service | 3003 | ✅ | ✅ | 5435 |
+| Stock-Payment Service | 3004 | ✅ | ✅ | 5437 |
+| Frontend | 5174/5173 | - | - | - |
+
+## Technology Stack
+
+- **Backend**: Node.js, Express.js
+- **GraphQL**: Apollo Server 4
+- **Database**: PostgreSQL
+- **Authentication**: JWT (JSON Web Token)
+- **Containerization**: Docker, Docker Compose
+- **Frontend**: React, Vite
+
+## License
+
+ISC

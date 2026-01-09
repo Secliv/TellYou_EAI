@@ -98,11 +98,25 @@ docker compose logs inventory-service
 
 Setelah semua services berjalan, akses melalui:
 
+### REST API Endpoints
 - **User Service**: http://localhost:3000
 - **Inventory Service**: http://localhost:3001
 - **Payment Service**: http://localhost:3002
 - **Order Service**: http://localhost:3003
-- **Stock-Payment Service**: http://localhost:3004
+- **Stock-Payment Service**: http://localhost:3004/api
+
+### GraphQL Endpoints (Memerlukan JWT Token)
+- **User Service GraphQL**: http://localhost:3000/graphql
+- **Inventory Service GraphQL**: http://localhost:3001/graphql
+- **Payment Service GraphQL**: http://localhost:3002/graphql
+- **Order Service GraphQL**: http://localhost:3003/graphql
+- **Stock-Payment Service GraphQL**: http://localhost:3004/graphql
+
+### Frontend
+- **Frontend (Docker)**: http://localhost:5174
+- **Frontend (Local)**: http://localhost:5173
+
+**⚠️ PENTING**: Semua GraphQL endpoints memerlukan JWT token untuk authentication. Lihat `GRAPHQL_AUTH_GUIDE.md` untuk panduan lengkap.
 
 ## Development Mode
 
