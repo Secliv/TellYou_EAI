@@ -1,0 +1,299 @@
+.users-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.users-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.users-header h1 {
+  color: #2c3e50;
+  margin: 0;
+}
+
+.users-count {
+  color: #666;
+}
+
+.users-count .count {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #3498db;
+}
+
+.users-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.users-stats .stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.users-stats .stat-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.users-stats .stat-info h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.users-stats .stat-info p {
+  margin: 0.3rem 0 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.users-stats .stat-card.admin {
+  border-left: 4px solid #f39c12;
+}
+
+.users-stats .stat-card.user {
+  border-left: 4px solid #3498db;
+}
+
+.users-table {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.users-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.users-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.users-table tr:hover {
+  background: #f8f9fa;
+}
+
+.users-table .username {
+  color: #2c3e50;
+}
+
+.you-badge {
+  background: #e8f4fd;
+  color: #3498db;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+  font-weight: normal;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.role-badge.role-admin {
+  background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+  color: white;
+}
+
+.role-badge.role-user {
+  background: #e8f4fd;
+  color: #3498db;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions .btn-edit,
+.actions .btn-delete {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.actions .btn-edit {
+  background: #3498db;
+  color: white;
+}
+
+.actions .btn-edit:hover {
+  background: #2980b9;
+}
+
+.actions .btn-delete {
+  background: #e74c3c;
+  color: white;
+}
+
+.actions .btn-delete:hover {
+  background: #c0392b;
+}
+
+.actions .btn-delete:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+  margin: 0 0 1.5rem;
+  color: #2c3e50;
+}
+
+.modal .form-group {
+  margin-bottom: 1rem;
+}
+
+.modal .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.modal .form-group input,
+.modal .form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.modal .form-group input:focus,
+.modal .form-group select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.modal-actions .btn-secondary {
+  background: #f8f9fa;
+  color: #666;
+}
+
+.modal-actions .btn-secondary:hover {
+  background: #e9ecef;
+}
+
+.modal-actions .btn-primary {
+  background: #3498db;
+  color: white;
+}
+
+.modal-actions .btn-primary:hover {
+  background: #2980b9;
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.error-message {
+  background: #fee;
+  color: #c00;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .users-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .users-table {
+    overflow-x: auto;
+  }
+  
+  .users-table table {
+    min-width: 700px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}

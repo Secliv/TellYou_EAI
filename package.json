@@ -1,0 +1,26 @@
+{
+  "name": "tellyou-eai",
+  "version": "1.0.0",
+  "description": "TELLYOU EAI - Sistem manajemen bahan kue dengan arsitektur microservices",
+  "scripts": {
+    "migrate": "node scripts/migrate-all.js",
+    "migrate:user": "node scripts/migrate-all.js user-service",
+    "migrate:docker": "bash scripts/migrate-docker.sh",
+    "setup-env": "node scripts/setup-env.js",
+    "dev": "node scripts/dev.js",
+    "health-check": "node scripts/health-check.js",
+    "check": "bash scripts/quick-check.sh"
+  },
+  "keywords": [
+    "microservices",
+    "nodejs",
+    "express",
+    "postgresql"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "axios": "^1.13.2",
+    "pg": "^8.16.3"
+  }
+}

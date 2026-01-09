@@ -1,0 +1,300 @@
+services:
+  # ============================================
+  # DATABASES
+  # ============================================
+  
+  # PostgreSQL untuk Stock-Payment Service
+  stock-payment-db:
+    image: postgres:15-alpine
+    container_name: stock-payment-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: stock_payment_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5437:5432"
+    volumes:
+      - stock_payment_db_data:/var/lib/postgresql/data
+    networks:
+      - tellyou-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL untuk Order Service (jika terpisah)
+  order-db:
+    image: postgres:15-alpine
+    container_name: order-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    networks:
+      - tellyou-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL untuk Payment Service (jika terpisah)
+  payment-db:
+    image: postgres:15-alpine
+    container_name: payment-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: payment_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+    networks:
+      - tellyou-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL untuk Inventory Service (jika terpisah)
+  inventory-db:
+    image: postgres:15-alpine
+    container_name: inventory-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: inventory_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - inventory_db_data:/var/lib/postgresql/data
+    networks:
+      - tellyou-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL untuk User Service (jika terpisah)
+  user-db:
+    image: postgres:15-alpine
+    container_name: user-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - tellyou-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # MICROSERVICES
+  # ============================================
+
+  # User Service
+  user-service:
+    build:
+      context: ./customer-service/user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: user-db
+      DB_PORT: 5432
+      DB_NAME: user_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      user-db:
+        condition: service_healthy
+    networks:
+      - tellyou-network
+
+  # Order Service
+  order-service:
+    build:
+      context: ./customer-service/order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_HOST: order-db
+      DB_PORT: 5432
+      DB_NAME: order_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      INVENTORY_SERVICE_URL: http://inventory-service:3003
+      PAYMENT_SERVICE_URL: http://payment-service:3002
+    depends_on:
+      order-db:
+        condition: service_healthy
+    networks:
+      - tellyou-network
+
+  # Payment Service
+  payment-service:
+    build:
+      context: ./customer-service/payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      DB_HOST: payment-db
+      DB_PORT: 5432
+      DB_NAME: payment_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      payment-db:
+        condition: service_healthy
+    networks:
+      - tellyou-network
+
+  # Inventory Service
+  inventory-service:
+    build:
+      context: ./customer-service/inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      NODE_ENV: production
+      PORT: 3003
+      DB_HOST: inventory-db
+      DB_PORT: 5432
+      DB_NAME: inventory_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      inventory-db:
+        condition: service_healthy
+    networks:
+      - tellyou-network
+
+  # Stock-Payment Service (NEW - Integration Facade)
+  stock-payment-service:
+    build:
+      context: ./customer-service/stock-payment-service
+      dockerfile: Dockerfile
+    container_name: stock-payment-service
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      SERVICE_NAME: stock-payment-service
+      
+      # Database Connection
+      DB_HOST: stock-payment-db
+      DB_PORT: 5432
+      DB_NAME: stock_payment_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      
+      # External Services Integration
+      ORDER_SERVICE_URL: http://order-service:3001
+      PAYMENT_SERVICE_URL: http://payment-service:3002
+      INVENTORY_SERVICE_URL: http://inventory-service:3003
+      
+      # GraphQL Config
+      GRAPHQL_ENDPOINT: /graphql
+      ENABLE_GRAPHIQL: "true"
+    depends_on:
+      stock-payment-db:
+        condition: service_healthy
+      order-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
+      inventory-service:
+        condition: service_started
+    networks:
+      - tellyou-network
+
+  # ============================================
+  # ADMIN TOOLS
+  # ============================================
+
+  # pgAdmin - Database Management Tool
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@tellyou.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - tellyou-network
+    depends_on:
+      - stock-payment-db
+      - order-db
+      - payment-db
+      - inventory-db
+      - user-db
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+  tellyou-network:
+    driver: bridge
+    name: tellyou-network
+
+# ============================================
+# VOLUMES
+# ============================================
+volumes:
+  stock_payment_db_data:
+    driver: local
+  order_db_data:
+    driver: local
+  payment_db_data:
+    driver: local
+  inventory_db_data:
+    driver: local
+  user_db_data:
+    driver: local
+  pgadmin_data:
+    driver: local

@@ -1,0 +1,493 @@
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dashboard h1 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+
+.welcome-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.welcome-section h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+}
+
+.welcome-section p {
+  margin: 0.3rem 0;
+  opacity: 0.9;
+}
+
+.role-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.2rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.role-badge.admin {
+  background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+}
+
+.role-badge.user {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stats-grid.user-stats {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card.users {
+  border-left: 4px solid #3498db;
+}
+
+.stat-card.inventory {
+  border-left: 4px solid #27ae60;
+}
+
+.stat-card.orders {
+  border-left: 4px solid #f39c12;
+}
+
+.stat-card.payments {
+  border-left: 4px solid #9b59b6;
+}
+
+.stat-card.pending {
+  border-left: 4px solid #f39c12;
+}
+
+.stat-card.confirmed {
+  border-left: 4px solid #3498db;
+}
+
+.stat-card.delivered {
+  border-left: 4px solid #27ae60;
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-info h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  margin: 0.3rem 0;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.warning-badge {
+  display: inline-block;
+  background: #fff3cd;
+  color: #856404;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.pending-badge {
+  display: inline-block;
+  background: #e8f4fd;
+  color: #3498db;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.sub-stat {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-section.quick-actions-section {
+  grid-column: 1 / -1;
+}
+
+.dashboard-section.orders-section {
+  grid-column: 1 / -1;
+}
+
+.dashboard-section h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.empty-text {
+  color: #999;
+  text-align: center;
+  padding: 2rem;
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.recent-item:hover {
+  background: #e9ecef;
+}
+
+.recent-item.low-stock {
+  background: #fff5f5;
+  border-left: 3px solid #e74c3c;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.item-info strong {
+  color: #2c3e50;
+}
+
+.item-amount {
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.stock-warning {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+}
+
+.view-all-link {
+  display: block;
+  text-align: right;
+  margin-top: 1rem;
+  color: #3498db;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.view-all-link:hover {
+  text-decoration: underline;
+}
+
+.inventory-value-section {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+}
+
+.inventory-value-section h3 {
+  margin: 0 0 0.5rem 0;
+  opacity: 0.9;
+}
+
+.big-value {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.empty-section {
+  text-align: center;
+  padding: 2rem;
+}
+
+.btn-action {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+
+.btn-action:hover {
+  transform: scale(1.05);
+}
+
+/* User Orders List */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.order-item:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.order-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.order-id {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.order-id strong {
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.order-date {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.order-items-preview {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.item-tag {
+  background: #e8f4fd;
+  color: #3498db;
+  padding: 0.2rem 0.6rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+}
+
+.more-items {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.order-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.order-total {
+  font-weight: 600;
+  color: #27ae60;
+  font-size: 1.1rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.quick-actions.user-actions {
+  grid-template-columns: 1fr 1fr;
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #2c3e50;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.action-card:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.action-card.create {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.action-card.create:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.action-icon {
+  font-size: 2rem;
+}
+
+.action-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: #e74c3c;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* Contact Info Section - No Card Style, Centered, Horizontal */
+.dashboard-section.contact-info-section {
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 2rem 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  margin: 2rem auto 0 auto;
+  width: 100%;
+}
+
+.contact-info-section h3 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.contact-info-list {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.contact-info-list span {
+  color: #666;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.contact-info-time {
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.contact-info-footer {
+  color: #999;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .quick-actions.user-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-info-section {
+    padding: 0.5rem 0;
+  }
+
+  .contact-info-list {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
